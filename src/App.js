@@ -7,6 +7,7 @@ export default function App() {
   const wave = () => {
     //tester
     //console.log("👋");
+    //3
   }
   
   return (
