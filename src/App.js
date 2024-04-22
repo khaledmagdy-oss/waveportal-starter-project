@@ -6,7 +6,8 @@ import abi from './utils/WavePortal.json';
 export default function App() {
 
   const [currentAccount, setCurrentAccount] = useState("");
-  const contractAddress = "0x11022b331814ed0970cbc5b20e9c87e794231da8"
+  const [waves, setWaves] = useState([]);
+  const contractAddress = "0xBFf363Dd1BB69737688e103d83bA6CaBFe05774F"
   const contractABI = abi.abi;
   const CheckIfWalletIsConnected = async () => {
     try {
@@ -53,7 +54,8 @@ export default function App() {
   }
   useEffect(() => {
     CheckIfWalletIsConnected();
-  })
+    getAllWaves();
+  }, [])
     const wave = async () => {
     try {
       const { ethereum } = window;
@@ -66,7 +68,7 @@ export default function App() {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
 
-        const waveTxn = await wavePortalContract.wave();
+        const waveTxn = await wavePortalContract.wave("hello, this is my message from my react app");
         console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
@@ -74,6 +76,35 @@ export default function App() {
 
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
+        getAllWaves();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getAllWaves = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        const waves = await wavePortalContract.getAllWaves();
+
+        let wavesCleaned = [];
+        waves.forEach(wave => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message
+          });
+        });
+
+        setWaves(wavesCleaned);
+        console.log(wavesCleaned);
       }
     } catch (error) {
       console.log(error);
