@@ -1,4 +1,7 @@
 import React from "react";
+import auth from './fireBase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+
 import { useNavigate } from "react-router-dom";
 function SignInForm() {
     const Navigate = useNavigate();
@@ -14,23 +17,32 @@ function SignInForm() {
     });
   };
 
-  const handleSignInClick = () => {
-    Navigate("/main");
-  }
 
-  const handleOnSubmit = evt => {
+  const handleSignIn = async (email, password) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleOnSubmit = async (evt) => {
     evt.preventDefault();
 
     const { email, password } = state;
-    alert(`You are login with email: ${email} and password: ${password}`);
-
-    for (const key in state) {
+    try {
+      await handleSignIn(email, password);
+      alert("Sign in successful!");
+      Navigate("/main");
       setState({
-        ...state,
-        [key]: ""
+        email: "",
+        password: ""
       });
+    } catch (error) {
+      alert(error.message);
     }
   };
+
 
   return (
     <div className="form-container sign-in-container">
@@ -50,9 +62,9 @@ function SignInForm() {
           value={state.password}
           onChange={handleChange}
         />
-        <a href="#">Forgot your password?</a>
+        {/* <a href="#">Forgot your password?</a> */}
         <button
-        onClick={handleSignInClick}
+        type="submit"
         >Sign In</button>
       </form>
     </div>
