@@ -4,6 +4,8 @@ import './index.css';
 import App from './App';
 import MainPage from './MainPage';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import process from 'process';
+window.process = process;
 
 ReactDOM.render(
     <BrowserRouter>

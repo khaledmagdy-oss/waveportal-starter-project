@@ -1,2 +1,9 @@
 node_modules
 .DS_Store
+.env
+pinataKeys.txt
+pinataFullKeys.txt
+Notes.txt
+appJs.txt
+config-overrides.js
+craco.config.js
