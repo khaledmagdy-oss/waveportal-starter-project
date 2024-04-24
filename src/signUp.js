@@ -19,11 +19,12 @@ function SignUpForm() {
   const handleOnSubmit = async (evt) => {
     evt.preventDefault();
 
-    const { email, password } = state;
+    const { name, email, password } = state;
     try {
       await handleSignup(email, password);
       alert("Signup successful!");
       setState({
+        name: "",
         email: "",
         password: ""
       });

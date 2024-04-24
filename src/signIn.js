@@ -32,6 +32,7 @@ function SignInForm() {
     const { email, password } = state;
     try {
       await handleSignIn(email, password);
+      localStorage.setItem("email", email);
       alert("Sign in successful!");
       Navigate("/main");
       setState({

@@ -11,14 +11,32 @@ export default function MainPage() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [file, setFile] = useState(null);
   const [waves, setWaves] = useState([]);
-  const contractAddress = "0xBFf363Dd1BB69737688e103d83bA6CaBFe05774F"
+  const [hash, setHash] = useState("");
+  const contractAddress = "0xFf33B97247c8d3549967AD4d99C24f17a351bd3A"
   const contractABI = abi.abi;
+
+  const [state, setState] = React.useState({
+    email: ""
+  });
+  const handleChange = evt => {
+    const value = evt.target.value;
+    setState({
+      ...state,
+      [evt.target.name]: value
+    });
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     console.log(file);
     setFile(file);
 };
+
+  const checkIfLoggedIn = async () => {
+    if(localStorage.getItem("email")==null){
+      window.location.href = "/";
+    }
+  }
 
   const CheckIfWalletIsConnected = async () => {
     try {
@@ -66,7 +84,50 @@ export default function MainPage() {
   useEffect(() => {
     CheckIfWalletIsConnected();
     getAllWaves();
+    checkIfLoggedIn();
+    retrieve();
   }, [])
+
+  const upload = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+        console.log("local email: %s, email: %s, hash: %s", localStorage.getItem("email"), state.email, hash);
+        if(localStorage.getItem("email") && state.email && hash){
+          await wavePortalContract.uploadFile(hash, localStorage.getItem("email"), state.email);
+          console.log("Uploaded file to blockchain");
+        }
+        else{
+          console.log("Please fill in all the fields");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const retrieve = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        //email is hardcoded change it when you implement the whatsapp template
+        const file = await wavePortalContract.getAllFilesForRecipient("khaledmagdy_02@hotmail.com");
+        console.log("Retrieved file from blockchain", file);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
     const wave = async () => {
     try {
       const { ethereum } = window;
@@ -142,7 +203,7 @@ export default function MainPage() {
         {
           headers: {
             Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5YWU4MjRhOS03NTZiLTRiMDItODQyNi02Yzc3N2ZjOGU2NDAiLCJlbWFpbCI6ImtoYWxlZF9tYWdkeTAyQGhvdG1haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJGUkExIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9LHsiaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6IjRiMzU3MTlmOTg3OTM0YWQwNTkxIiwic2NvcGVkS2V5U2VjcmV0IjoiNTg1MjE0OTlhMTQyYmM4NDc2ZThjMTY4NmY1NDYwZThmNWNmOWFkN2M1MTAwNDExMjc2OWFmYzJiODhlMDMxYSIsImlhdCI6MTcxMzk2MjU3Mn0.ryodOTG455nOQrL1Pz5p_raRsvsYn_V_nP7bLI3AF2g`,
-            "Content-Type": "multipart/form-data", // Add this header
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -150,6 +211,8 @@ export default function MainPage() {
       console.log(
         `View the file here: https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`
       );
+      setHash(res.data.IpfsHash);
+      upload();
       setFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -164,7 +227,8 @@ export default function MainPage() {
     <div className="mainContainer">
   <div className="dataContainer">
     <div className="header">
-      👋 Hey there!
+    <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+      👋 Hey there! {localStorage.getItem("email")}
     </div>
     {!currentAccount && (
       <button className="waveButton" onClick={ConnectWallet}>
@@ -175,11 +239,26 @@ export default function MainPage() {
       Wave at Me
     </button>
     <div class="documentManagement">
-      <h1>Document Management</h1>
+      <h1>Send Files</h1>
       <div>
         <label>Upload Document:</label>
         <input type="file" ref={fileInputRef} onChange={handleFileChange}/>
+        <label>Send To:</label>
+        <input
+          type="email"
+          placeholder="Email"
+          name="email"
+          value={state.email}
+          onChange={handleChange}
+        />
         <button onClick={pinFileToIPFS}>Upload</button>
+      </div>
+      <div class="documentManagement">
+        <h1>View Chats</h1>
+        <div>
+          <button >--{">"}</button>
+        </div>
+        <br /><br /><br /><br /><br />
       </div>
     </div>
   </div>

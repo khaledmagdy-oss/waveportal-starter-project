@@ -12,7 +12,6 @@ ReactDOM.render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/main" element={<MainPage />} />
-        {/* Add more routes here */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>,
