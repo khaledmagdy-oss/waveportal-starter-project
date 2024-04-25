@@ -33,12 +33,12 @@ function SignInForm() {
     try {
       await handleSignIn(email, password);
       localStorage.setItem("email", email);
-      alert("Sign in successful!");
-      Navigate("/main");
       setState({
         email: "",
         password: ""
       });
+      alert("Sign in successful!");
+      Navigate("/main");
     } catch (error) {
       alert(error.message);
     }

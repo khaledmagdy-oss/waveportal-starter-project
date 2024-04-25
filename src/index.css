@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
 }
 
 code {
@@ -14,3 +15,4 @@ code {
 .documentManagement {
   margin-top: 100px; /* Adjust the value to increase or decrease the distance */
 }
+

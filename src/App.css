@@ -32,3 +32,12 @@
   border-radius: 5px;
   
 }
+.contentNav {
+  justify-content: space-between; /* Align items at each end */
+  align-items: center; /* Center items vertically */
+}
+
+.buttonsNav {
+  display: flex;
+  gap: 300px; /* Adjust spacing between buttons */
+}

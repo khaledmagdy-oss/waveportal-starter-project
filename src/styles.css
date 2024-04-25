@@ -50,8 +50,8 @@
   
   button {
     border-radius: 20px;
-    border: 1px solid #ff4b2b;
-    background-color: #ff4b2b;
+    border: 1px solid #044f6b;
+    background-color: #044f6b;
     color: #ffffff;
     font-size: 12px;
     font-weight: bold;
@@ -254,5 +254,12 @@
   footer a {
     color: #3c97bf;
     text-decoration: none;
+  }
+  .navbar-container {
+    position:relative;
+    display: fixed; /* Fix the Navbar to the top of the viewport */
+    top: 0; /* Align to the top of the viewport */
+    width: 100%; /* Occupy the full width of the viewport */
+    z-index: 999; /* Ensure Navbar appears above other elements */
   }
   

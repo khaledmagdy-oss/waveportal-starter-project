@@ -3,17 +3,21 @@ import { ethers } from "ethers";
 import './App.css';
 import abi from './utils/WavePortal.json';
 import axios from 'axios';
+import Navbar from "./components/Navbar";
+import { useNavigate } from "react-router-dom";
 const FormData = require('form-data')
+
 
 
 export default function MainPage() {
 
   const [currentAccount, setCurrentAccount] = useState("");
   const [file, setFile] = useState(null);
-  const [waves, setWaves] = useState([]);
+  //const [waves, setWaves] = useState([]);
   const [hash, setHash] = useState("");
   const contractAddress = "0xFf33B97247c8d3549967AD4d99C24f17a351bd3A"
   const contractABI = abi.abi;
+  const Navigate = useNavigate();
 
   const [state, setState] = React.useState({
     email: ""
@@ -30,10 +34,10 @@ export default function MainPage() {
     const file = e.target.files[0];
     console.log(file);
     setFile(file);
-};
+  };
 
   const checkIfLoggedIn = async () => {
-    if(localStorage.getItem("email")==null){
+    if (localStorage.getItem("email") == null) {
       window.location.href = "/";
     }
   }
@@ -45,20 +49,20 @@ export default function MainPage() {
         console.log("Make sure you have metamask!");
         return;
       } else {
-        console.log("We have the ethereum object", ethereum);
+        console.log("metamask connected!");
       }
-  
+
       const accounts = await ethereum.request({ method: 'eth_accounts' });
-  
+
       if (accounts.length !== 0) {
         const account = accounts[0];
-        console.log("Found an authorized account:", account);
+        console.log("Wallet connected:", account);
         setCurrentAccount(account);
       } else {
-        console.log("No authorized account found")
+        console.log("Please connect your wallet")
       }
     }
-     catch (error) {
+    catch (error) {
       console.log(error);
     }
 
@@ -67,14 +71,14 @@ export default function MainPage() {
   const ConnectWallet = async () => {
     try {
       const { ethereum } = window;
-  
+
       if (!ethereum) {
         alert("Get MetaMask!");
         return;
       }
-  
+
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-  
+
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
     } catch (error) {
@@ -83,12 +87,12 @@ export default function MainPage() {
   }
   useEffect(() => {
     CheckIfWalletIsConnected();
-    getAllWaves();
+    // getAllWaves();
     checkIfLoggedIn();
-    retrieve();
+    //remove when you implement the whatsapp template
   }, [])
 
-  const upload = async () => {
+  const upload = async (hash) => {
     try {
       const { ethereum } = window;
 
@@ -97,11 +101,11 @@ export default function MainPage() {
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
         console.log("local email: %s, email: %s, hash: %s", localStorage.getItem("email"), state.email, hash);
-        if(localStorage.getItem("email") && state.email && hash){
+        if (localStorage.getItem("email") && state.email && hash) {
           await wavePortalContract.uploadFile(hash, localStorage.getItem("email"), state.email);
           console.log("Uploaded file to blockchain");
         }
-        else{
+        else {
           console.log("Please fill in all the fields");
         }
       }
@@ -110,78 +114,60 @@ export default function MainPage() {
     }
   }
 
-  const retrieve = async () => {
-    try {
-      const { ethereum } = window;
+  //   const wave = async () => {
+  //   try {
+  //     const { ethereum } = window;
 
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+  //     if (ethereum) {
+  //       const provider = new ethers.providers.Web3Provider(ethereum);
+  //       const signer = provider.getSigner();
+  //       const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-        //email is hardcoded change it when you implement the whatsapp template
-        const file = await wavePortalContract.getAllFilesForRecipient("khaledmagdy_02@hotmail.com");
-        console.log("Retrieved file from blockchain", file);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  //       let count = await wavePortalContract.getTotalWaves();
+  //       console.log("Retrieved total wave count...", count.toNumber());
 
-    const wave = async () => {
-    try {
-      const { ethereum } = window;
+  //       const waveTxn = await wavePortalContract.wave("hello, this is my message from my react app");
+  //       console.log("Mining...", waveTxn.hash);
 
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+  //       await waveTxn.wait();
+  //       console.log("Mined -- ", waveTxn.hash);
 
-        let count = await wavePortalContract.getTotalWaves();
-        console.log("Retrieved total wave count...", count.toNumber());
+  //       count = await wavePortalContract.getTotalWaves();
+  //       console.log("Retrieved total wave count...", count.toNumber());
+  //       getAllWaves();
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
-        const waveTxn = await wavePortalContract.wave("hello, this is my message from my react app");
-        console.log("Mining...", waveTxn.hash);
+  // const getAllWaves = async () => {
+  //   try {
+  //     const { ethereum } = window;
 
-        await waveTxn.wait();
-        console.log("Mined -- ", waveTxn.hash);
+  //     if (ethereum) {
+  //       const provider = new ethers.providers.Web3Provider(ethereum);
+  //       const signer = provider.getSigner();
+  //       const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-        count = await wavePortalContract.getTotalWaves();
-        console.log("Retrieved total wave count...", count.toNumber());
-        getAllWaves();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  //       const waves = await wavePortalContract.getAllWaves();
 
-  const getAllWaves = async () => {
-    try {
-      const { ethereum } = window;
+  //       let wavesCleaned = [];
+  //       waves.forEach(wave => {
+  //         wavesCleaned.push({
+  //           address: wave.waver,
+  //           timestamp: new Date(wave.timestamp * 1000),
+  //           message: wave.message
+  //         });
+  //       });
 
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-
-        const waves = await wavePortalContract.getAllWaves();
-
-        let wavesCleaned = [];
-        waves.forEach(wave => {
-          wavesCleaned.push({
-            address: wave.waver,
-            timestamp: new Date(wave.timestamp * 1000),
-            message: wave.message
-          });
-        });
-
-        setWaves(wavesCleaned);
-        console.log(wavesCleaned);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  //       setWaves(wavesCleaned);
+  //       console.log(wavesCleaned);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   const fileInputRef = React.useRef();
 
@@ -191,12 +177,12 @@ export default function MainPage() {
         console.log("No file selected");
         return;
       }
-  
+
       let data = new FormData();
       data.append("file", file);
       data.append("pinataOptions", '{"cidVersion": 0}');
       data.append("pinataMetadata", '{"name": "uploaded_file"}');
-  
+
       const res = await axios.post(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
         data,
@@ -211,8 +197,9 @@ export default function MainPage() {
       console.log(
         `View the file here: https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`
       );
-      setHash(res.data.IpfsHash);
-      upload();
+      const hash = res.data.IpfsHash;
+      setHash(hash);
+      upload(hash);
       setFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -221,49 +208,50 @@ export default function MainPage() {
       console.log(error);
     }
   };
-  
-  
+  const handleClick = () => {
+    Navigate("/chats"); // Navigate to the "/chats" route
+  };
+
+
   return (
     <div className="mainContainer">
-  <div className="dataContainer">
-    <div className="header">
-    <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-      👋 Hey there! {localStorage.getItem("email")}
-    </div>
-    {!currentAccount && (
-      <button className="waveButton" onClick={ConnectWallet}>
-        Connect Wallet
-      </button>
-    )}
-    <button className="waveButton" onClick={wave}>
-      Wave at Me
-    </button>
-    <div class="documentManagement">
-      <h1>Send Files</h1>
-      <div>
-        <label>Upload Document:</label>
-        <input type="file" ref={fileInputRef} onChange={handleFileChange}/>
-        <label>Send To:</label>
-        <input
-          type="email"
-          placeholder="Email"
-          name="email"
-          value={state.email}
-          onChange={handleChange}
-        />
-        <button onClick={pinFileToIPFS}>Upload</button>
-      </div>
-      <div class="documentManagement">
-        <h1>View Chats</h1>
-        <div>
-          <button >--{">"}</button>
+      <div className="dataContainer">
+        <br /><br /><br /><br /><br /><br /><br />
+      <Navbar />
+        <div className="headerMain">
+          👋 Hey there! {localStorage.getItem("email")}
         </div>
-        <br /><br /><br /><br /><br />
+        {!currentAccount && (
+          <button className="waveButton" onClick={ConnectWallet}>
+            Connect Wallet
+          </button>
+        )}
+        <div className="documentManagement">
+          <h1>Send Files</h1>
+          <div>
+            <label>Upload Document:</label>
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} />
+            <label>Send To:</label>
+            <input
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={state.email}
+              onChange={handleChange}
+            />
+            <button onClick={pinFileToIPFS}>Upload</button>
+          </div>
+          <div className="documentManagement">
+            <h1>View Chats</h1>
+            <div>
+              <button onClick={handleClick} >--{">"}</button>
+            </div>
+            <br /><br /><br /><br /><br />
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-    
+
   );
 }
