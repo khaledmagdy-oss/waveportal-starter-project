@@ -1,19 +1,27 @@
 body{
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 0 ;
+  align-items: center;
+  padding: 0 ;
+  width:100%;
+  display: contents;
 }
+
+.mainPage {
+  justify-content: center ;
+  align-items: center ;
+}
+
 .mainContainer {
   display: flex;
   justify-content: center;
+  align-items: center ;
   width: 100%;
-  margin-top: 64px;
 }
 
 .dataContainer {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 600px;
 }
 
 .header {
@@ -36,6 +44,7 @@ body{
   border-radius: 5px;
   
 }
+
 .contentNav {
   justify-content: space-between; /* Align items at each end */
   align-items: center; /* Center items vertically */
@@ -44,6 +53,5 @@ body{
 .buttonsNav {
   display: flex;
   justify-content: space-between;
-  
   cursor: pointer;
 }

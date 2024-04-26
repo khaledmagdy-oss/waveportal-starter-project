@@ -5,6 +5,8 @@ import abi from './utils/WavePortal.json';
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import chatBackground from './chatBackground.jpg';
+import background from './background.png';
+
 
 export default function Chats() {
     const contractAddress = "0x5db2A1a29373F6CF0c2920B1567F94BFD4AF6cBA"
@@ -49,6 +51,7 @@ export default function Chats() {
                 setChatBoxes(chats);
             }
         } catch (error) {
+            console.log(error);
         }
     }
 
@@ -71,6 +74,7 @@ export default function Chats() {
                 setChatBoxes(chats);
             }
         } catch (error) {
+            console.log(error);
         }
     }
 
@@ -79,7 +83,19 @@ export default function Chats() {
             // Call the search function with the current input value when Enter key is pressed
             search(searchInput);
         }
+        if (event.key === 'Backspace') {
+            // Call the search function with the current input value when Enter key is pressed
+            search(searchInput);
+        }
+        if (event.key) {
+            // Call the search function with the current input value when Enter key is pressed
+            search(searchInput);
+        }
+        if (searchInput === "") {
+            search(searchInput);
+        }
     };
+    search();
 
     const handleChatBoxClick = async (chatBox) => {
         try {
@@ -101,15 +117,17 @@ export default function Chats() {
                 setChat(messages);
             }
         } catch (error) {
+            console.log(error);
         }
     }
 
     return (
 
-        <div>
+        <div style={{ backgroundImage: `url(${background})` }}>
             <div>
-                <br /><br />
+                <br />
                 <Navbar />
+                <br />
             </div>
             {/* HTML Content */}
             <div className="background-green"></div>
@@ -169,20 +187,25 @@ export default function Chats() {
                     <div className="header">
                         <div className="img-text">
 
-                            <h4 style={{ fontFamily: 'Courier New, Courier, monospace', fontSize: '18px', fontWeight: 'bold', color: '#FFF' }}>{sender}<br /></h4>
+                            <h4 style={{ fontFamily: 'Courier New, Courier, monospace', fontSize: '20px', fontWeight: 'bold', color: '#FFF' }}>{sender}<br /></h4>
                         </div>
                     </div>
 
                     {/* Chat container */}
-                    <div className="chat-container"style={{ backgroundImage: `url(${chatBackground})` }}>
+                    <div className="chat-container" style={{ backgroundImage: `url(${chatBackground})` }}>
                         {/* <img src="/chatBackground.jpg" alt="background" /> */}
                         {chat.map((file, index) => (
                             <div className="chat-box" key={index}>
                                 <div className="chat-details">
                                     <div className="text-head">
-                                        <br />
-                                        <Link to={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`} target="_blank" className="custom-link">&nbsp;&nbsp;&nbsp;&nbsp;{file.title}</Link>
-                                        <br />
+                                        
+                                        <div className="link-box">
+                                            <Link to={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`} target="_blank" className="custom-link">
+                                                {file.title}
+                                            </Link>
+                                        </div>
+
+                                        
                                     </div>
                                 </div>
                             </div>

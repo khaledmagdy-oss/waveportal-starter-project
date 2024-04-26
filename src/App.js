@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./styles.css";
 import SignInForm from "./signIn";
 import SignUpForm from "./signUp";
+import background from './background.png';
 
 export default function App() {
   const [type, setType] = useState("signIn");
@@ -15,8 +16,7 @@ export default function App() {
   const containerClass =
     "container " + (type === "signUp" ? "right-panel-active" : "");
   return (
-    <div className="App">
-      <h2>Sign in/up Form</h2>
+    <div className="App" style={{ backgroundImage: `url(${background})` }}>
       <div className={containerClass} id="container">
         <SignUpForm />
         <SignInForm />

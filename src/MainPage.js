@@ -5,8 +5,9 @@ import abi from './utils/WavePortal.json';
 import axios from 'axios';
 import Navbar from "./components/Navbar";
 import { useNavigate } from "react-router-dom";
-import CryptoJS from 'crypto-js';
+import background from './background.png';
 const FormData = require('form-data')
+
 
 
 export default function MainPage() {
@@ -18,8 +19,7 @@ export default function MainPage() {
   const contractAddress = "0x5db2A1a29373F6CF0c2920B1567F94BFD4AF6cBA"
   const contractABI = abi.abi;
   const Navigate = useNavigate();
-  const key = CryptoJS.lib.WordArray.random(256 / 8);
-  const secretKey = CryptoJS.enc.Base64.stringify(key);
+
 
   const [state, setState] = React.useState({
     title: "",
@@ -90,9 +90,7 @@ export default function MainPage() {
   }
   useEffect(() => {
     CheckIfWalletIsConnected();
-    // getAllWaves();
     checkIfLoggedIn();
-    //remove when you implement the whatsapp template
   }, [])
 
   const upload = async (hash) => {
@@ -103,7 +101,7 @@ export default function MainPage() {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-        console.log("title: %s, local email: %s, email: %s, hash: %s",state.title, localStorage.getItem("email"), state.email, hash);
+        console.log("title: %s, local email: %s, email: %s, hash: %s", state.title, localStorage.getItem("email"), state.email, hash);
         if (localStorage.getItem("email") && state.email && hash) {
           await wavePortalContract.uploadFile(state.title, hash, localStorage.getItem("email"), state.email);
           console.log("Uploaded file to blockchain");
@@ -180,9 +178,16 @@ export default function MainPage() {
         console.log("No file selected");
         return;
       }
+      if (!state.email) {
+        console.log("No email entered");
+        return;
+      }
+      if (!state.title) {
+        console.log("No title entered");
+        return;
+      }
 
       let data = new FormData();
-      //const encryptedData = CryptoJS.AES.encrypt(file, secretKey).toString();
       data.append("file", file);
       data.append("pinataOptions", '{"cidVersion": 0}');
       data.append("pinataMetadata", '{"name": "uploaded_file"}');
@@ -218,52 +223,59 @@ export default function MainPage() {
 
 
   return (
-    <div className="mainContainer">
-      <div className="dataContainer">
-        <br /><br /><br /><br /><br /><br /><br />
-        <Navbar />
-        <div className="headerMain">
-          👋 Hey there! {localStorage.getItem("email")}
-        </div>
-        {!currentAccount && (
-          <button className="waveButton" onClick={ConnectWallet}>
-            Connect Wallet
-          </button>
-        )}
-        <div className="documentManagement">
-          <h1>Send Files</h1>
-          <div>
-            <label>Upload Document:</label> <br />
-            <label>File Title:</label>
-            <input
-              type="text"
-              name="title"
-              value={state.name}
-              onChange={handleChange}
-              placeholder="Title"
-              required
-            />
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} />
-            <label>Send To:</label>
-            <input
-              type="email"
-              placeholder="Email"
-              name="email"
-              value={state.email}
-              onChange={handleChange}
-            />
-            <button onClick={pinFileToIPFS}>Upload</button>
+    <div className="mainPage" style={{ backgroundImage: `url(${background})` }}>
+      <div className="mainContainer">
+        <div className="dataContainer">
+          <br />
+          <Navbar />
+          <div className="headerMain">
+            👋 Hey there! <br /> {localStorage.getItem("email")}
           </div>
+          {!currentAccount && (
+            <button className="waveButton" onClick={ConnectWallet}>
+              Connect Wallet
+            </button>
+          )}
           <div className="documentManagement">
-            <h1>View Chats</h1>
+            <h1>Send Files</h1>
             <div>
-              <button onClick={handleClick} >--{">"}</button>
+              <br />
+              <label>File Title:</label>
+              <input
+                type="text"
+                name="title"
+                value={state.name}
+                onChange={handleChange}
+                placeholder="Title"
+                required
+              />
+              <label>Choose File:</label>
+              <input type="file" ref={fileInputRef} onChange={handleFileChange} />
+              <br />
+              <label>Send To:</label>
+              <input
+                type="email"
+                placeholder="Email"
+                name="email"
+                value={state.email}
+                onChange={handleChange}
+                required
+              />
+              <br />
+              <button onClick={pinFileToIPFS}>Send</button>
             </div>
-            <br /><br /><br /><br /><br />
+            <div className="documentManagement">
+              <h1>View Chats</h1>
+              <div>
+                <button onClick={handleClick} >--{">"}</button>
+              </div>
+              <br /><br /><br /><br /><br />
+            </div>
           </div>
         </div>
       </div>
     </div>
+
 
 
   );
