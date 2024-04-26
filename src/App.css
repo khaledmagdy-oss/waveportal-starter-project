@@ -1,3 +1,7 @@
+body{
+  margin: 0 !important;
+  padding: 0 !important;
+}
 .mainContainer {
   display: flex;
   justify-content: center;
@@ -39,5 +43,7 @@
 
 .buttonsNav {
   display: flex;
-  gap: 300px; /* Adjust spacing between buttons */
+  justify-content: space-between;
+  
+  cursor: pointer;
 }

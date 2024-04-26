@@ -5,8 +5,8 @@ import abi from './utils/WavePortal.json';
 import axios from 'axios';
 import Navbar from "./components/Navbar";
 import { useNavigate } from "react-router-dom";
+import CryptoJS from 'crypto-js';
 const FormData = require('form-data')
-
 
 
 export default function MainPage() {
@@ -15,11 +15,14 @@ export default function MainPage() {
   const [file, setFile] = useState(null);
   //const [waves, setWaves] = useState([]);
   const [hash, setHash] = useState("");
-  const contractAddress = "0xFf33B97247c8d3549967AD4d99C24f17a351bd3A"
+  const contractAddress = "0x5db2A1a29373F6CF0c2920B1567F94BFD4AF6cBA"
   const contractABI = abi.abi;
   const Navigate = useNavigate();
+  const key = CryptoJS.lib.WordArray.random(256 / 8);
+  const secretKey = CryptoJS.enc.Base64.stringify(key);
 
   const [state, setState] = React.useState({
+    title: "",
     email: ""
   });
   const handleChange = evt => {
@@ -100,9 +103,9 @@ export default function MainPage() {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-        console.log("local email: %s, email: %s, hash: %s", localStorage.getItem("email"), state.email, hash);
+        console.log("title: %s, local email: %s, email: %s, hash: %s",state.title, localStorage.getItem("email"), state.email, hash);
         if (localStorage.getItem("email") && state.email && hash) {
-          await wavePortalContract.uploadFile(hash, localStorage.getItem("email"), state.email);
+          await wavePortalContract.uploadFile(state.title, hash, localStorage.getItem("email"), state.email);
           console.log("Uploaded file to blockchain");
         }
         else {
@@ -179,6 +182,7 @@ export default function MainPage() {
       }
 
       let data = new FormData();
+      //const encryptedData = CryptoJS.AES.encrypt(file, secretKey).toString();
       data.append("file", file);
       data.append("pinataOptions", '{"cidVersion": 0}');
       data.append("pinataMetadata", '{"name": "uploaded_file"}');
@@ -217,7 +221,7 @@ export default function MainPage() {
     <div className="mainContainer">
       <div className="dataContainer">
         <br /><br /><br /><br /><br /><br /><br />
-      <Navbar />
+        <Navbar />
         <div className="headerMain">
           👋 Hey there! {localStorage.getItem("email")}
         </div>
@@ -229,7 +233,16 @@ export default function MainPage() {
         <div className="documentManagement">
           <h1>Send Files</h1>
           <div>
-            <label>Upload Document:</label>
+            <label>Upload Document:</label> <br />
+            <label>File Title:</label>
+            <input
+              type="text"
+              name="title"
+              value={state.name}
+              onChange={handleChange}
+              placeholder="Title"
+              required
+            />
             <input type="file" ref={fileInputRef} onChange={handleFileChange} />
             <label>Send To:</label>
             <input

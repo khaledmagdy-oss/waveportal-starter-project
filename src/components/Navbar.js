@@ -29,7 +29,7 @@ const Navbar = () => {
                         <h1>Bach Proj</h1>
                     </Link> */}
                     <div className="buttonsNav">
-                        <button className="btn btn-secondary" onClick={handleGoBack}>
+                        <button className="btn-btn-secondary" onClick={handleGoBack}>
                             Go Back
                         </button>
                         <button className="btn btn-primary" onClick={handleLogout}>

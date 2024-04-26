@@ -4,24 +4,54 @@ import { ethers } from "ethers";
 import abi from './utils/WavePortal.json';
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import chatBackground from './chatBackground.jpg';
 
 export default function Chats() {
-    const contractAddress = "0xFf33B97247c8d3549967AD4d99C24f17a351bd3A"
+    const contractAddress = "0x5db2A1a29373F6CF0c2920B1567F94BFD4AF6cBA"
     const contractABI = abi.abi;
-    const [retrievedFiles, setRetrievedFiles] = useState([]);
     const [chat, setChat] = useState([]);
     const [chatBoxes, setChatBoxes] = useState([]);
+    const [sender, setSender] = useState("");
+    const [searchInput, setSearchInput] = useState("");
 
     useEffect(() => {
         checkIfLoggedIn();
         retrieve();
     }, [])
 
+    const handleInputChange = (event) => {
+        setSearchInput(event.target.value);
+        search();
+    };
+
     const checkIfLoggedIn = async () => {
         if (localStorage.getItem("email") == null) {
             window.location.href = "/";
         }
     }
+
+    const search = async () => {
+        try {
+            const { ethereum } = window;
+            let chats = []
+            if (ethereum) {
+                const provider = new ethers.providers.Web3Provider(ethereum);
+                const signer = provider.getSigner();
+                const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+                let files = []
+                //email is hardcoded change it when you implement the whatsapp template
+                files = await wavePortalContract.getAllFilesForRecipient(localStorage.getItem("email"));
+                files.forEach(file => {
+                    if (file.sender.includes(searchInput) && !chats.includes(file.sender))
+                        chats.push(file.sender);
+                });
+                setChatBoxes(chats);
+            }
+        } catch (error) {
+        }
+    }
+
     const retrieve = async () => {
         try {
             const { ethereum } = window;
@@ -35,7 +65,7 @@ export default function Chats() {
                 //email is hardcoded change it when you implement the whatsapp template
                 files = await wavePortalContract.getAllFilesForRecipient(localStorage.getItem("email"));
                 files.forEach(file => {
-                    if(!chats.includes(file.sender))
+                    if (!chats.includes(file.sender))
                         chats.push(file.sender);
                 });
                 setChatBoxes(chats);
@@ -43,6 +73,13 @@ export default function Chats() {
         } catch (error) {
         }
     }
+
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            // Call the search function with the current input value when Enter key is pressed
+            search(searchInput);
+        }
+    };
 
     const handleChatBoxClick = async (chatBox) => {
         try {
@@ -54,11 +91,12 @@ export default function Chats() {
                 const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
                 let files = []
+                setSender(chatBox);
                 //email is hardcoded change it when you implement the whatsapp template
                 files = await wavePortalContract.getAllFilesForRecipient(localStorage.getItem("email"));
                 files.forEach(file => {
-                    if(file.sender == chatBox)
-                        messages.push(`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`);
+                    if (file.sender == chatBox)
+                        messages.push(file);
                 });
                 setChat(messages);
             }
@@ -78,7 +116,7 @@ export default function Chats() {
             <div className="main-container">
                 <div className="left-container">
                     {/* Header */}
-                    <div className="header">
+                    {/* <div className="header">
                         <div className="user-img">
                             <img className="dp" src="https://www.codewithfaraz.com/InstaPic.png" alt="" />
                         </div>
@@ -87,7 +125,7 @@ export default function Chats() {
                             <li><i className="fa-solid fa-message"></i></li>
                             <li><i className="fa-solid fa-ellipsis-vertical"></i></li>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Notification */}
                     <div className="notif-box">
@@ -100,23 +138,29 @@ export default function Chats() {
                     <div className="search-container">
                         <div className="input">
                             <i className="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" placeholder="Search for a chat" />
+                            <input
+                                type="text"
+                                placeholder="Search for a chat"
+                                value={searchInput}
+                                onChange={handleInputChange}
+                                onKeyPress={handleKeyPress}
+                            />
                         </div>
-                        <i className="fa-sharp fa-solid fa-bars-filter"></i>
                     </div>
 
                     {/* Chats */}
                     <div className="chat-list">
-                    {chatBoxes.map((chatBox, index) => (
+                        {chatBoxes.map((chatBox, index) => (
                             <div className="chat-box" key={index} onClick={() => handleChatBoxClick(chatBox)}>
+                                <br /><br />
                                 <div className="chat-details">
-                                    <div className="text-head">
-                                        <h4>{chatBox}</h4>
+                                    <div className="text-head" style={{ fontFamily: 'Courier New, Courier, monospace', fontSize: '18px', fontWeight: 'bold', color: '#333' }}>
+                                        {chatBox}
                                     </div>
                                 </div>
                             </div>
                         ))}
-                        
+
                     </div>
                 </div>
 
@@ -125,17 +169,20 @@ export default function Chats() {
                     <div className="header">
                         <div className="img-text">
 
-                            <h4>Email here<br /></h4>
+                            <h4 style={{ fontFamily: 'Courier New, Courier, monospace', fontSize: '18px', fontWeight: 'bold', color: '#FFF' }}>{sender}<br /></h4>
                         </div>
                     </div>
 
                     {/* Chat container */}
-                    <div className="chat-container">
-                    {chat.map((text, index) => (
+                    <div className="chat-container"style={{ backgroundImage: `url(${chatBackground})` }}>
+                        {/* <img src="/chatBackground.jpg" alt="background" /> */}
+                        {chat.map((file, index) => (
                             <div className="chat-box" key={index}>
                                 <div className="chat-details">
                                     <div className="text-head">
-                                        <Link to={text} target="_blank" className="custom-link">{text}</Link>
+                                        <br />
+                                        <Link to={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`} target="_blank" className="custom-link">&nbsp;&nbsp;&nbsp;&nbsp;{file.title}</Link>
+                                        <br />
                                     </div>
                                 </div>
                             </div>
