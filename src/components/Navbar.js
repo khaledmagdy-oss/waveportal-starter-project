@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../styles.css';
 
 
@@ -32,6 +32,9 @@ const Navbar = () => {
                         <button className="btn-btn-secondary" onClick={handleGoBack}>
                             Go Back
                         </button>
+                        <div className="filebuddy">
+                            FileBuddy
+                        </div>
                         <button className="btn btn-primary" onClick={handleLogout}>
                             Log Out
                         </button>

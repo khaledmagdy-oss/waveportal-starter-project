@@ -61,7 +61,7 @@
   background: #e5ddd5;
 }
 
-.main-container .right-container::before {
+/* .main-container .right-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -70,7 +70,7 @@
   height: 100%;
   background: url(https://camo.githubusercontent.com/854a93c27d64274c4f8f5a0b6ec36ee1d053cfcd934eac6c63bed9eaef9764bd/68747470733a2f2f7765622e77686174736170702e636f6d2f696d672f62672d636861742d74696c652d6461726b5f61346265353132653731393562366237333364393131306234303866303735642e706e67);
   opacity: 0.5;
-}
+} */
 
 .header {
   position: relative;
@@ -81,12 +81,16 @@
   background:#009688;
   padding: 0 15px;
 }
+.exit-chat {
+  position: absolute;
+  right: 0;
+  cursor: pointer;
+  color: #fff;
+}
 .headerMain {
     position: relative;
-    display: flex;
     align-items: center;
     width: 100%;
-    height: 60px;
     padding: 0 15px;
     text-align: center;
   font-size: 32px;
@@ -190,9 +194,8 @@
   position:relative;
   width: 100%;
   height: 40px;
-  background: #f6f6f6;
+  background: #e8e8e8;
   display: flex;
-/*   justify-content: center; */
   align-items: center;
 }
 
@@ -200,7 +203,7 @@
   width: 121%;
   outline: none;
   border: none;
-  background: #fff;
+  background: #f9f9f9;
   padding: 5px;
   height: 30x;
   border-radius: 10px;
@@ -219,19 +222,20 @@
 
 .chat-list {
   position: relative;
-  height:calc(100% - 170px);
+  height:79vh;
   overflow-y: auto;
+  background: #d4d4d7;
 }
 
 .chat-list .chat-box {
   position: relative;
   width: 100%;
   display:flex;
-/*   justify-content: center; */
+  justify-content: center;
   align-items:center;
   cursor: pointer;
   padding: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 2px solid #eee;
 }
 
 .chat-list .chat-box .img-box {
@@ -359,8 +363,8 @@ img {
 .chat-container {
   position:relative;
   width: 100%;
-  height: calc(100% - 120px);  /*60+60*/
-  /* padding: 50px; */
+  height: 85vh;
+    padding: 3%; 
   overflow-y: auto;
 }
 

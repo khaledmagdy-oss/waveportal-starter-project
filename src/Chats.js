@@ -9,7 +9,7 @@ import background from './background.png';
 
 
 export default function Chats() {
-    const contractAddress = "0x5db2A1a29373F6CF0c2920B1567F94BFD4AF6cBA"
+    const contractAddress = "0xeE7F6142a3E624AC6Cbd186a34176F4C703F283c"
     const contractABI = abi.abi;
     const [chat, setChat] = useState([]);
     const [chatBoxes, setChatBoxes] = useState([]);
@@ -18,12 +18,12 @@ export default function Chats() {
 
     useEffect(() => {
         checkIfLoggedIn();
-        retrieve();
-    }, [])
+        displayChats();
+    })
 
     const handleInputChange = (event) => {
         setSearchInput(event.target.value);
-        search();
+        displayChats();
     };
 
     const checkIfLoggedIn = async () => {
@@ -32,7 +32,7 @@ export default function Chats() {
         }
     }
 
-    const search = async () => {
+    const displayChats = async () => {
         try {
             const { ethereum } = window;
             let chats = []
@@ -42,7 +42,6 @@ export default function Chats() {
                 const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
                 let files = []
-                //email is hardcoded change it when you implement the whatsapp template
                 files = await wavePortalContract.getAllFilesForRecipient(localStorage.getItem("email"));
                 files.forEach(file => {
                     if (file.sender.includes(searchInput) && !chats.includes(file.sender))
@@ -51,51 +50,9 @@ export default function Chats() {
                 setChatBoxes(chats);
             }
         } catch (error) {
-            console.log(error);
+            // console.log(error);
         }
     }
-
-    const retrieve = async () => {
-        try {
-            const { ethereum } = window;
-            let chats = []
-            if (ethereum) {
-                const provider = new ethers.providers.Web3Provider(ethereum);
-                const signer = provider.getSigner();
-                const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-
-                let files = []
-                //email is hardcoded change it when you implement the whatsapp template
-                files = await wavePortalContract.getAllFilesForRecipient(localStorage.getItem("email"));
-                files.forEach(file => {
-                    if (!chats.includes(file.sender))
-                        chats.push(file.sender);
-                });
-                setChatBoxes(chats);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const handleKeyPress = (event) => {
-        if (event.key === 'Enter') {
-            // Call the search function with the current input value when Enter key is pressed
-            search(searchInput);
-        }
-        if (event.key === 'Backspace') {
-            // Call the search function with the current input value when Enter key is pressed
-            search(searchInput);
-        }
-        if (event.key) {
-            // Call the search function with the current input value when Enter key is pressed
-            search(searchInput);
-        }
-        if (searchInput === "") {
-            search(searchInput);
-        }
-    };
-    search();
 
     const handleChatBoxClick = async (chatBox) => {
         try {
@@ -108,10 +65,9 @@ export default function Chats() {
 
                 let files = []
                 setSender(chatBox);
-                //email is hardcoded change it when you implement the whatsapp template
                 files = await wavePortalContract.getAllFilesForRecipient(localStorage.getItem("email"));
                 files.forEach(file => {
-                    if (file.sender == chatBox)
+                    if (file.sender === chatBox)
                         messages.push(file);
                 });
                 setChat(messages);
@@ -119,6 +75,11 @@ export default function Chats() {
         } catch (error) {
             console.log(error);
         }
+    }
+
+    const exitChat = () => {
+        setChat([]);
+        setSender("");
     }
 
     return (
@@ -161,7 +122,6 @@ export default function Chats() {
                                 placeholder="Search for a chat"
                                 value={searchInput}
                                 onChange={handleInputChange}
-                                onKeyPress={handleKeyPress}
                             />
                         </div>
                     </div>
@@ -186,26 +146,27 @@ export default function Chats() {
                     {/* Header */}
                     <div className="header">
                         <div className="img-text">
-
                             <h4 style={{ fontFamily: 'Courier New, Courier, monospace', fontSize: '20px', fontWeight: 'bold', color: '#FFF' }}>{sender}<br /></h4>
                         </div>
+                        {chat.length > 0 && (
+                            <button className="exit-chat" onClick={exitChat}><i className="fa-solid fa-arrow-left"></i> Exit Chat</button>
+                        )}
                     </div>
 
                     {/* Chat container */}
                     <div className="chat-container" style={{ backgroundImage: `url(${chatBackground})` }}>
-                        {/* <img src="/chatBackground.jpg" alt="background" /> */}
                         {chat.map((file, index) => (
                             <div className="chat-box" key={index}>
                                 <div className="chat-details">
                                     <div className="text-head">
-                                        
+
                                         <div className="link-box">
                                             <Link to={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`} target="_blank" className="custom-link">
                                                 {file.title}
                                             </Link>
                                         </div>
 
-                                        
+
                                     </div>
                                 </div>
                             </div>

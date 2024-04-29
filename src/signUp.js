@@ -19,12 +19,10 @@ function SignUpForm() {
   const handleOnSubmit = async (evt) => {
     evt.preventDefault();
 
-    const { name, email, password } = state;
+    const { email, password } = state;
     try {
       await handleSignup(email, password);
-      alert("Signup successful!");
       setState({
-        name: "",
         email: "",
         password: ""
       });
@@ -37,8 +35,7 @@ function SignUpForm() {
   const handleSignup = async (email, password) => {
     try {
       console.log(email, password);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      //const user = userCredential.user;
+      await createUserWithEmailAndPassword(auth, email, password);
       alert('Signup successful!');
     } catch (error) {
       alert(error.message);

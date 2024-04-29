@@ -6,25 +6,26 @@ import axios from 'axios';
 import Navbar from "./components/Navbar";
 import { useNavigate } from "react-router-dom";
 import background from './background.png';
+import loadingIndicator from './loading.gif'
+
+
 const FormData = require('form-data')
-
-
 
 export default function MainPage() {
 
   const [currentAccount, setCurrentAccount] = useState("");
   const [file, setFile] = useState(null);
-  //const [waves, setWaves] = useState([]);
-  const [hash, setHash] = useState("");
-  const contractAddress = "0x5db2A1a29373F6CF0c2920B1567F94BFD4AF6cBA"
+  const [loading, setLoading] = useState(false);
+  const contractAddress = "0xeE7F6142a3E624AC6Cbd186a34176F4C703F283c"
   const contractABI = abi.abi;
   const Navigate = useNavigate();
 
 
   const [state, setState] = React.useState({
-    title: "",
+    description: "",
     email: ""
   });
+
   const handleChange = evt => {
     const value = evt.target.value;
     setState({
@@ -49,7 +50,7 @@ export default function MainPage() {
     try {
       const { ethereum } = window;
       if (!ethereum) {
-        console.log("Make sure you have metamask!");
+        alert("Make sure you have metamask extension enabled!");
         return;
       } else {
         console.log("metamask connected!");
@@ -62,7 +63,7 @@ export default function MainPage() {
         console.log("Wallet connected:", account);
         setCurrentAccount(account);
       } else {
-        console.log("Please connect your wallet")
+        alert("Please connect your wallet")
       }
     }
     catch (error) {
@@ -101,13 +102,13 @@ export default function MainPage() {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-        console.log("title: %s, local email: %s, email: %s, hash: %s", state.title, localStorage.getItem("email"), state.email, hash);
+        console.log("description: %s, local email: %s, email: %s, hash: %s", state.description, localStorage.getItem("email"), state.email, hash);
         if (localStorage.getItem("email") && state.email && hash) {
-          await wavePortalContract.uploadFile(state.title, hash, localStorage.getItem("email"), state.email);
-          console.log("Uploaded file to blockchain");
+          await wavePortalContract.uploadFile(state.description, hash, localStorage.getItem("email"), state.email);
+          alert("Uploaded file to blockchain");
         }
         else {
-          console.log("Please fill in all the fields");
+          alert("Please fill in all the fields");
         }
       }
     } catch (error) {
@@ -115,75 +116,21 @@ export default function MainPage() {
     }
   }
 
-  //   const wave = async () => {
-  //   try {
-  //     const { ethereum } = window;
-
-  //     if (ethereum) {
-  //       const provider = new ethers.providers.Web3Provider(ethereum);
-  //       const signer = provider.getSigner();
-  //       const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-
-  //       let count = await wavePortalContract.getTotalWaves();
-  //       console.log("Retrieved total wave count...", count.toNumber());
-
-  //       const waveTxn = await wavePortalContract.wave("hello, this is my message from my react app");
-  //       console.log("Mining...", waveTxn.hash);
-
-  //       await waveTxn.wait();
-  //       console.log("Mined -- ", waveTxn.hash);
-
-  //       count = await wavePortalContract.getTotalWaves();
-  //       console.log("Retrieved total wave count...", count.toNumber());
-  //       getAllWaves();
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-
-  // const getAllWaves = async () => {
-  //   try {
-  //     const { ethereum } = window;
-
-  //     if (ethereum) {
-  //       const provider = new ethers.providers.Web3Provider(ethereum);
-  //       const signer = provider.getSigner();
-  //       const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-
-  //       const waves = await wavePortalContract.getAllWaves();
-
-  //       let wavesCleaned = [];
-  //       waves.forEach(wave => {
-  //         wavesCleaned.push({
-  //           address: wave.waver,
-  //           timestamp: new Date(wave.timestamp * 1000),
-  //           message: wave.message
-  //         });
-  //       });
-
-  //       setWaves(wavesCleaned);
-  //       console.log(wavesCleaned);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-
   const fileInputRef = React.useRef();
 
   const pinFileToIPFS = async () => {
     try {
+      setLoading("true")
       if (!file) {
-        console.log("No file selected");
+        alert("No file selected");
         return;
       }
       if (!state.email) {
-        console.log("No email entered");
+        alert("No email entered");
         return;
       }
-      if (!state.title) {
-        console.log("No title entered");
+      if (!state.description) {
+        alert("No description entered");
         return;
       }
 
@@ -191,7 +138,6 @@ export default function MainPage() {
       data.append("file", file);
       data.append("pinataOptions", '{"cidVersion": 0}');
       data.append("pinataMetadata", '{"name": "uploaded_file"}');
-
       const res = await axios.post(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
         data,
@@ -203,22 +149,26 @@ export default function MainPage() {
         }
       );
       console.log(res.data);
+      const hash = res.data.IpfsHash;
+      await upload(hash);
       console.log(
         `View the file here: https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`
       );
-      const hash = res.data.IpfsHash;
-      setHash(hash);
-      upload(hash);
+      setLoading(false)
       setFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     } catch (error) {
       console.log(error);
+      setLoading(false)
     }
   };
   const handleClick = () => {
-    Navigate("/chats"); // Navigate to the "/chats" route
+    if (currentAccount)
+      Navigate("/chats"); // Navigate to the "/chats" route
+    else
+      alert("Please connect your wallet");
   };
 
 
@@ -228,6 +178,7 @@ export default function MainPage() {
         <div className="dataContainer">
           <br />
           <Navbar />
+          <br /><br />
           <div className="headerMain">
             👋 Hey there! <br /> {localStorage.getItem("email")}
           </div>
@@ -240,13 +191,13 @@ export default function MainPage() {
             <h1>Send Files</h1>
             <div>
               <br />
-              <label>File Title:</label>
+              <label>File Description:</label>
               <input
                 type="text"
-                name="title"
+                name="description"
                 value={state.name}
                 onChange={handleChange}
-                placeholder="Title"
+                placeholder="Description"
                 required
               />
               <label>Choose File:</label>
@@ -262,6 +213,13 @@ export default function MainPage() {
                 required
               />
               <br />
+              {loading && (
+                <div className="loading-spinner">
+                  <div className="spinner-border" role="status">
+                    <img src={(loadingIndicator)} alt="Loading..." />
+                  </div>
+                </div>
+              )}
               <button onClick={pinFileToIPFS}>Send</button>
             </div>
             <div className="documentManagement">

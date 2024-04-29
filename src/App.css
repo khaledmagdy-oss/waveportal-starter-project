@@ -36,6 +36,11 @@ body{
   margin-top: 16px;
 }
 
+.loading-spinner .spinner-border {
+  width: 20%; /* Adjust the width to your desired size */
+  height: 20%; /* Adjust the height to your desired size */
+}
+
 .waveButton {
   cursor: pointer;
   margin-top: 16px;
