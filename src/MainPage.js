@@ -50,10 +50,10 @@ export default function MainPage() {
     try {
       const { ethereum } = window;
       if (!ethereum) {
-        alert("Make sure you have metamask extension enabled!");
+        alert("Make sure you have your wallet's browser extension enabled!");
         return;
       } else {
-        console.log("metamask connected!");
+        console.log("wallet connected connected!");
       }
 
       const accounts = await ethereum.request({ method: 'eth_accounts' });
@@ -77,7 +77,7 @@ export default function MainPage() {
       const { ethereum } = window;
 
       if (!ethereum) {
-        alert("Get MetaMask!");
+        alert("Get a crypto wallet!");
         return;
       }
 
