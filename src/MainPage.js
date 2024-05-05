@@ -53,7 +53,7 @@ export default function MainPage() {
         alert("Make sure you have your wallet's browser extension enabled!");
         return;
       } else {
-        console.log("wallet connected connected!");
+        console.log("wallet connected!");
       }
 
       const accounts = await ethereum.request({ method: 'eth_accounts' });
