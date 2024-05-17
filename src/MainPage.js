@@ -105,7 +105,7 @@ export default function MainPage() {
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
         if (localStorage.getItem("email") && state.email && hash) {
           await wavePortalContract.uploadFile(state.description, hash, localStorage.getItem("email"), state.email);
-          alert("File has been uploaded successfully!");
+          alert("File has been sent successfully!");
         }
         else {
           alert("Please fill in all the fields");
