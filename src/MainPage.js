@@ -84,6 +84,7 @@ export default function MainPage() {
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
 
       console.log("Connected", accounts[0]);
+      alert("Wallet connected!");
       setCurrentAccount(accounts[0]);
     } catch (error) {
       console.log(error);
@@ -102,15 +103,15 @@ export default function MainPage() {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-        console.log("description: %s, local email: %s, email: %s, hash: %s", state.description, localStorage.getItem("email"), state.email, hash);
         if (localStorage.getItem("email") && state.email && hash) {
           await wavePortalContract.uploadFile(state.description, hash, localStorage.getItem("email"), state.email);
-          alert("Uploaded file to blockchain");
+          alert("File has been uploaded successfully!");
         }
         else {
           alert("Please fill in all the fields");
         }
       }
+      setLoading(false)
     } catch (error) {
       console.log(error);
     }
@@ -148,12 +149,8 @@ export default function MainPage() {
           },
         }
       );
-      console.log(res.data);
       const hash = res.data.IpfsHash;
       await upload(hash);
-      console.log(
-        `View the file here: https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`
-      );
       setLoading(false)
       setFile(null);
       if (fileInputRef.current) {

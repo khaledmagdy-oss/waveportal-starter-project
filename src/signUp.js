@@ -34,7 +34,6 @@ function SignUpForm() {
 
   const handleSignup = async (email, password) => {
     try {
-      console.log(email, password);
       await createUserWithEmailAndPassword(auth, email, password);
       alert('Signup successful!');
     } catch (error) {
