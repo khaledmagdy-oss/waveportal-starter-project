@@ -121,7 +121,6 @@ export default function MainPage() {
 
   const pinFileToIPFS = async () => {
     try {
-      setLoading("true")
       if (!file) {
         alert("No file selected");
         return;
@@ -134,6 +133,7 @@ export default function MainPage() {
         alert("No description entered");
         return;
       }
+      setLoading(true)
 
       let data = new FormData();
       data.append("file", file);
